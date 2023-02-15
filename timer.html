@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+        <style>
+            #setup {
+                display: flex;
+                justify-content: center;
+            }
+            #setup span {
+                margin-right: 1em;
+            }
+            #setup input[type=number] {
+                width: 4rem;
+            }
+            #timer {
+                font-size: 29vw;
+                text-align: center;
+            }
+            #cost {
+                font-size: 5vw;
+                text-align: center;
+                margin-top: -1em;
+            }
+            body {
+                background-color: #222;
+                color: #eee;
+                font-family: 'Lato', sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="setup">
+            <span>
+                <label for="in-numPeople"># people: </label>
+                <input type="number" id="in-numPeople" value="20" maxlength="5" size="5"/>
+            </span>
+            <span>
+                <label for="in-costPerHourPerPerson">$/hr/person: </label>
+                <input type="number" id="in-costPerHourPerPerson" value="100" maxlength="4" size="4"/>
+            </span>
+            <!-- todo: have a start time so the cash knows when to reset, and when to start accruing? -->
+            <span>
+                <label for="in-targetTime">Meeting end time: </label>
+                <input type="time" id="in-targetTime" value="14:00"/>
+            </span>
+        </div>
+        <div id="timer"></div>
+        <div id="cost"></div>
+
+        <script>
+            let t = document.querySelector('#timer');
+            let c = document.querySelector('#cost');
+
+            let updateTimer = function() {
+                let inputTimeElement = document.querySelector('#in-targetTime');
+                let givenTimeValues = inputTimeElement.value.split(':');
+                let givenHour = parseInt(givenTimeValues[0]);
+                let givenMinute = parseInt(givenTimeValues[1]);
+
+                let now = new Date();
+                let targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), givenHour, givenMinute, 0, 0);
+                let afterTime = now > targetTime;
+                let remaining = targetTime - now;
+                if (afterTime) {
+                    document.body.style.backgroundColor = '#ffd21f';
+                    document.body.style.color = '#222';
+                    remaining = now - targetTime;
+                } else {
+                    document.body.style.backgroundColor = '#222';
+                    document.body.style.color = '#eee';
+                }
+                let remainingDate = new Date(remaining);
+                // todo: support hours
+                t.innerText = `${afterTime ? '+' : ''}${remainingDate.getMinutes().toString().padStart(2, '0')}:${remainingDate.getSeconds().toString().padStart(2, '0')}`;
+            }
+
+            let msSinceLast = 0;
+            let currentTotal = 0;
+            let lastUpdateTime = new Date().getTime();
+            let updateCost = function() {
+                // todo: $ should get zeroed out if the meeting time(s) change. or have some other mechanism for determining when to start it over again or stop incrementing it
+                let costPerHourPerPerson = parseFloat(document.querySelector('#in-costPerHourPerPerson').value);
+                let numPeople = parseInt(document.querySelector('#in-numPeople').value);
+
+                let costPerPersonPerMs = costPerHourPerPerson / 60 / 60 / 1000;
+                let nowMs = new Date().getTime();
+                let msSinceLast = nowMs - lastUpdateTime;
+                let costPerPersonSinceLast = costPerPersonPerMs * msSinceLast;
+                let costSinceLast = costPerPersonSinceLast * numPeople;
+
+                currentTotal += costSinceLast;
+
+                c.innerText = currentTotal.toLocaleString('en-US', { 
+                    style: 'currency', 
+                    currency: 'USD' 
+                });
+
+                lastUpdateTime = nowMs;
+            }
+
+            updateTimer();
+            updateCost();
+            setInterval(updateTimer, 1000);
+            setInterval(updateCost, 50);
+        </script>
+    </body>
+</html>
