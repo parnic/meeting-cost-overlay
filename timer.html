@@ -15,10 +15,15 @@
                 width: 4rem;
             }
             #timer {
-                font-size: 29vw;
                 text-align: center;
                 line-height: 1;
                 margin-top: 0.2em;
+            }
+            .text-with-hour {
+                font-size: 20vw;
+            }
+            .text-no-hour {
+                font-size: 29vw;
             }
             #cost {
                 font-size: 5vw;
@@ -69,6 +74,15 @@
                 return {givenHour: givenHour, givenMinute: givenMinute};
             }
 
+            let hmsTimeDiff = function(durationMs) {
+                let totalSec = durationMs / 1000;
+                let secs = totalSec % 60;
+                let totalMins = totalSec / 60;
+                let mins = totalMins % 60;
+                let totalHours = totalMins / 60;
+                return {hours: Math.trunc(totalHours), mins: Math.trunc(mins), secs: Math.trunc(secs)};
+            }
+
             let updateTimer = function() {
                 let {givenHour, givenMinute} = parseTimeFromElement('#in-targetTime');
                 if (isNaN(givenHour) || isNaN(givenMinute)) {
@@ -85,9 +99,17 @@
                 } else {
                     document.body.className = 'in-time';
                 }
-                let remainingDate = new Date(remaining);
-                // todo: support hours
-                t.innerText = `${afterTime ? '+' : ''}${remainingDate.getMinutes().toString().padStart(2, '0')}:${remainingDate.getSeconds().toString().padStart(2, '0')}`;
+
+                let {hours, mins, secs} = hmsTimeDiff(remaining);
+                let str = afterTime ? '+' : '';
+                if (hours > 0) {
+                    str += `${hours}:${mins.toString().padStart(2, '0')}:`;
+                    t.className = 'text-with-hour';
+                } else {
+                    str += `${mins}:`;
+                    t.className = 'text-no-hour';
+                }
+                t.innerText = `${str}${secs.toString().padStart(2, '0')}`;
             }
 
             let msSinceLast = 0;
