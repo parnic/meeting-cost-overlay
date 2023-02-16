@@ -53,11 +53,20 @@
             let t = document.querySelector('#timer');
             let c = document.querySelector('#cost');
 
-            let updateTimer = function() {
-                let inputTimeElement = document.querySelector('#in-targetTime');
+            let parseTimeFromElement = function(selector) {
+                let inputTimeElement = document.querySelector(selector);
                 let givenTimeValues = inputTimeElement.value.split(':');
                 let givenHour = parseInt(givenTimeValues[0]);
                 let givenMinute = parseInt(givenTimeValues[1]);
+
+                return {givenHour: givenHour, givenMinute: givenMinute};
+            }
+
+            let updateTimer = function() {
+                let {givenHour, givenMinute} = parseTimeFromElement('#in-targetTime');
+                if (isNaN(givenHour) || isNaN(givenMinute)) {
+                    return;
+                }
 
                 let now = new Date();
                 let targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), givenHour, givenMinute, 0, 0);
@@ -81,8 +90,19 @@
             let lastUpdateTime = new Date().getTime();
             let updateCost = function() {
                 // todo: $ should get zeroed out if the meeting time(s) change. or have some other mechanism for determining when to start it over again or stop incrementing it
-                let costPerHourPerPerson = parseFloat(document.querySelector('#in-costPerHourPerPerson').value);
-                let numPeople = parseInt(document.querySelector('#in-numPeople').value);
+                let costPerHourPerPersonElem = document.querySelector('#in-costPerHourPerPerson').value;
+                let numPeopleElem = document.querySelector('#in-numPeople').value;
+
+                if (costPerHourPerPersonElem.length == 0 || numPeopleElem.length == 0) {
+                    return;
+                }
+
+                let costPerHourPerPerson = parseFloat(costPerHourPerPersonElem);
+                let numPeople = parseInt(numPeopleElem);
+
+                if (!costPerHourPerPerson || !numPeople) {
+                    return;
+                }
 
                 let costPerPersonPerMs = costPerHourPerPerson / 60 / 60 / 1000;
                 let nowMs = new Date().getTime();
