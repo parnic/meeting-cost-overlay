@@ -52,9 +52,12 @@
                 <label for="in-costPerHourPerPerson">$/hr/person: </label>
                 <input type="number" id="in-costPerHourPerPerson" value="100" maxlength="4" size="4"/>
             </span>
-            <!-- todo: have a start time so the cash knows when to reset, and when to start accruing? -->
             <span>
-                <label for="in-targetTime">Meeting end time: </label>
+                <label for="in-sourceTime">Start time: </label>
+                <input type="time" id="in-sourceTime" value="13:00"/>
+            </span>
+            <span>
+                <label for="in-targetTime">End time: </label>
                 <input type="time" id="in-targetTime" value="14:00"/>
             </span>
         </div>
@@ -64,10 +67,21 @@
         <script>
             let t = document.querySelector('#timer');
             let c = document.querySelector('#cost');
+            let costPerHourPerPersonElem = document.querySelector('#in-costPerHourPerPerson');
+            let numPeopleElem = document.querySelector('#in-numPeople');
+            let sourceTimeElem = document.querySelector('#in-sourceTime');
+            let targetTimeElem = document.querySelector('#in-targetTime');
 
-            let parseTimeFromElement = function(selector) {
-                let inputTimeElement = document.querySelector(selector);
-                let givenTimeValues = inputTimeElement.value.split(':');
+            let msSinceLast = 0;
+            let currentTotal = 0;
+            let lastUpdateTime = new Date().getTime();
+
+            sourceTimeElem.addEventListener('change', function(event) {
+                currentTotal = 0;
+            });
+
+            let parseTimeFromElement = function(element) {
+                let givenTimeValues = element.value.split(':');
                 let givenHour = parseInt(givenTimeValues[0]);
                 let givenMinute = parseInt(givenTimeValues[1]);
 
@@ -83,14 +97,22 @@
                 return {hours: Math.trunc(totalHours), mins: Math.trunc(mins), secs: Math.trunc(secs)};
             }
 
-            let updateTimer = function() {
-                let {givenHour, givenMinute} = parseTimeFromElement('#in-targetTime');
+            let getDateFromTimeElement = function(now, element) {
+                let {givenHour, givenMinute} = parseTimeFromElement(element);
                 if (isNaN(givenHour) || isNaN(givenMinute)) {
+                    return null;
+                }
+
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate(), givenHour, givenMinute, 0, 0);
+            }
+
+            let updateTimer = function() {
+                let now = new Date();
+                let targetTime = getDateFromTimeElement(now, targetTimeElem);
+                if (!targetTime) {
                     return;
                 }
 
-                let now = new Date();
-                let targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), givenHour, givenMinute, 0, 0);
                 let afterTime = now > targetTime;
                 let remaining = targetTime - now;
                 if (afterTime) {
@@ -112,32 +134,33 @@
                 t.innerText = `${str}${secs.toString().padStart(2, '0')}`;
             }
 
-            let msSinceLast = 0;
-            let currentTotal = 0;
-            let lastUpdateTime = new Date().getTime();
             let updateCost = function() {
                 // todo: $ should get zeroed out if the meeting time(s) change. or have some other mechanism for determining when to start it over again or stop incrementing it
-                let costPerHourPerPersonElem = document.querySelector('#in-costPerHourPerPerson').value;
-                let numPeopleElem = document.querySelector('#in-numPeople').value;
-
-                if (costPerHourPerPersonElem.length == 0 || numPeopleElem.length == 0) {
+                if (costPerHourPerPersonElem.value.length == 0 || numPeopleElem.value.length == 0) {
                     return;
                 }
 
-                let costPerHourPerPerson = parseFloat(costPerHourPerPersonElem);
-                let numPeople = parseInt(numPeopleElem);
-
+                let costPerHourPerPerson = parseFloat(costPerHourPerPersonElem.value);
+                let numPeople = parseInt(numPeopleElem.value);
                 if (!costPerHourPerPerson || !numPeople) {
                     return;
                 }
 
-                let costPerPersonPerMs = costPerHourPerPerson / 60 / 60 / 1000;
-                let nowMs = new Date().getTime();
-                let msSinceLast = nowMs - lastUpdateTime;
-                let costPerPersonSinceLast = costPerPersonPerMs * msSinceLast;
-                let costSinceLast = costPerPersonSinceLast * numPeople;
+                let now = new Date();
+                let nowMs = now.getTime();
+                let sourceTime = getDateFromTimeElement(now, sourceTimeElem);
+                if (!sourceTime) {
+                    return;
+                }
 
-                currentTotal += costSinceLast;
+                if (sourceTime < now) {
+                    let costPerPersonPerMs = costPerHourPerPerson / 60 / 60 / 1000;
+                    let msSinceLast = nowMs - lastUpdateTime;
+                    let costPerPersonSinceLast = costPerPersonPerMs * msSinceLast;
+                    let costSinceLast = costPerPersonSinceLast * numPeople;
+
+                    currentTotal += costSinceLast;
+                }
 
                 c.innerText = currentTotal.toLocaleString('en-US', { 
                     style: 'currency', 
