@@ -24,13 +24,19 @@
                 margin-top: -1em;
             }
             body {
+                font-family: 'Lato', sans-serif;
+            }
+            .in-time {
                 background-color: #222;
                 color: #eee;
-                font-family: 'Lato', sans-serif;
+            }
+            .over-time {
+                background-color: #ffd21f;
+                color: #222;
             }
         </style>
     </head>
-    <body>
+    <body class="in-time">
         <div id="setup">
             <span>
                 <label for="in-numPeople"># people: </label>
@@ -73,12 +79,10 @@
                 let afterTime = now > targetTime;
                 let remaining = targetTime - now;
                 if (afterTime) {
-                    document.body.style.backgroundColor = '#ffd21f';
-                    document.body.style.color = '#222';
+                    document.body.className = 'over-time';
                     remaining = now - targetTime;
                 } else {
-                    document.body.style.backgroundColor = '#222';
-                    document.body.style.color = '#eee';
+                    document.body.className = 'in-time';
                 }
                 let remainingDate = new Date(remaining);
                 // todo: support hours
