@@ -35,10 +35,34 @@
             .in-time {
                 background-color: #222;
                 color: #eee;
+                fill: #eee;
+                stroke: #111;
             }
             .over-time {
                 background-color: #ffd21f;
                 color: #222;
+                fill: #222;
+                stroke: #eee;
+            }
+            .svg-baseline-hanging {
+                dominant-baseline: hanging;
+            }
+            .svg-timer {
+                stroke-width: 1.3vh;
+                paint-order: stroke fill;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                text-anchor: middle;
+            }
+            .svg-cost {
+                stroke-width: 1vh;
+                paint-order: stroke fill;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                text-anchor: middle;
+            }
+            .mt-2 {
+                margin-top: 0.2em;
             }
         </style>
     </head>
@@ -61,8 +85,16 @@
                 <input type="time" id="in-targetTime" value="14:00"/>
             </span>
         </div>
-        <div id="timer"></div>
-        <div id="cost"></div>
+        <div class="text-with-hour svg-baseline-hanging mt-2">
+            <svg width="100%" height="1em">
+                <text id="timer" x="50%" y="0" class="svg-timer"></text>
+            </svg>
+        </div>
+        <div class="svg-baseline-hanging">
+            <svg width="100%" height="3em">
+                <text id="cost" x="50%" y="8" class="svg-cost"></text>
+            </svg>
+        </div>
 
         <script>
             let t = document.querySelector('#timer');
@@ -131,7 +163,7 @@
                     str += `${mins}:`;
                     t.className = 'text-no-hour';
                 }
-                t.innerText = `${str}${secs.toString().padStart(2, '0')}`;
+                t.textContent = `${str}${secs.toString().padStart(2, '0')}`;
             }
 
             let updateCost = function() {
@@ -161,7 +193,7 @@
                     currentTotal += costSinceLast;
                 }
 
-                c.innerText = currentTotal.toLocaleString('en-US', { 
+                c.textContent = currentTotal.toLocaleString('en-US', { 
                     style: 'currency', 
                     currency: 'USD' 
                 });
