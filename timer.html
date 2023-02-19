@@ -200,25 +200,23 @@
             let currentTotal = 0;
             let lastUpdateTime = new Date().getTime();
 
+            const saveValue = (event) => {
+                localStorage.setItem(event.currentTarget.id, event.currentTarget.value);
+            };
             sourceTimeElem.addEventListener('change', function(event) {
                 currentTotal = 0;
-                localStorage.setItem('sourceTime', event.currentTarget.value);
+                saveValue(event);
             });
-            targetTimeElem.addEventListener('change', function(event) {
-                localStorage.setItem('targetTime', event.currentTarget.value);
-            });
-            numPeopleElem.addEventListener('change', function(event) {
-                localStorage.setItem('numPeople', event.currentTarget.value);
-            });
-            costPerHourPerPersonElem.addEventListener('change', function(event) {
-                localStorage.setItem('costPerHourPerPerson', event.currentTarget.value);
-            });
+            targetTimeElem.addEventListener('change', saveValue);
+            numPeopleElem.addEventListener('change', saveValue);
+            costPerHourPerPersonElem.addEventListener('change', saveValue);
+
             for (const color of colorList) {
                 const colorDefault = getComputedStyle(rootElem).getPropertyValue(`--${color}`).trim();
 
                 const elem = document.querySelector(`#${color}`);
                 elem.addEventListener('input', function(event) {
-                    localStorage.setItem(color, event.currentTarget.value);
+                    saveValue(event);
                     rootElem.style.setProperty(`--${color}`, event.currentTarget.value);
                 });
 
@@ -320,23 +318,18 @@
             }
 
             const applySavedValues = function() {
-                const sourceTime = localStorage.getItem('sourceTime');
-                const targetTime = localStorage.getItem('targetTime');
-                const numPeople = localStorage.getItem('numPeople');
-                const costPerHourPerPerson = localStorage.getItem('costPerHourPerPerson');
-
-                if (sourceTime) {
-                    sourceTimeElem.value = sourceTime;
+                const applyValue = (elem) => {
+                    const savedVal = localStorage.getItem(elem.id);
+                    if (savedVal) {
+                        elem.value = savedVal;
+                        elem.dispatchEvent(new Event('input'));
+                        elem.dispatchEvent(new Event('change'));
+                    }
                 }
-                if (targetTime) {
-                    targetTimeElem.value = targetTime;
-                }
-                if (numPeople) {
-                    numPeopleElem.value = numPeople;
-                }
-                if (costPerHourPerPerson) {
-                    costPerHourPerPersonElem.value = costPerHourPerPerson;
-                }
+                applyValue(sourceTimeElem);
+                applyValue(targetTimeElem);
+                applyValue(numPeopleElem);
+                applyValue(costPerHourPerPersonElem);
 
                 // attempt to set style variables from local storage
                 for (const color of colorList) {
