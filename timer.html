@@ -4,12 +4,25 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
         <style>
+            :root {
+                --in-time-bgcolor: #222222;
+                --in-time-color: #eeeeee;
+                --in-time-fill: #eeeeee;
+                --in-time-stroke: #111111;
+
+                --over-time-bgcolor: #ffd21f;
+                --over-time-color: #222222;
+                --over-time-fill: #222222;
+                --over-time-stroke: #eeeeee;
+            }
             #setup {
                 display: flex;
+                flex-wrap: wrap;
                 justify-content: center;
+                margin-top: 0.2em;
             }
-            #setup span {
-                margin-right: 1em;
+            .setup-item {
+                margin: 0.3em;
             }
             #setup input[type=number] {
                 width: 4rem;
@@ -17,7 +30,6 @@
             #timer {
                 text-align: center;
                 line-height: 1;
-                margin-top: 0.2em;
             }
             .text-with-hour {
                 font-size: 20vw;
@@ -36,16 +48,16 @@
                 transition: all ease .5s;
             }
             .in-time {
-                background-color: #222;
-                color: #eee;
-                fill: #eee;
-                stroke: #111;
+                background-color: var(--in-time-bgcolor);
+                color: var(--in-time-color);
+                fill: var(--in-time-fill);
+                stroke: var(--in-time-stroke);
             }
             .over-time {
-                background-color: #ffd21f;
-                color: #222;
-                fill: #222;
-                stroke: #eee;
+                background-color: var(--over-time-bgcolor);
+                color: var(--over-time-color);
+                fill: var(--over-time-fill);
+                stroke: var(--over-time-stroke);
             }
             .svg-baseline-hanging {
                 dominant-baseline: hanging;
@@ -70,24 +82,6 @@
         </style>
     </head>
     <body class="in-time">
-        <div id="setup">
-            <span>
-                <label for="in-numPeople"># people: </label>
-                <input type="number" id="in-numPeople" value="20" maxlength="5" size="5"/>
-            </span>
-            <span>
-                <label for="in-costPerHourPerPerson">$/hr/person: </label>
-                <input type="number" id="in-costPerHourPerPerson" value="100" maxlength="4" size="4"/>
-            </span>
-            <span>
-                <label for="in-sourceTime">Start time: </label>
-                <input type="time" id="in-sourceTime" value="13:00"/>
-            </span>
-            <span>
-                <label for="in-targetTime">End time: </label>
-                <input type="time" id="in-targetTime" value="14:00"/>
-            </span>
-        </div>
         <div class="text-with-hour svg-baseline-hanging mt-2">
             <svg width="100%" height="1em">
                 <text id="timer" x="50%" y="0" class="svg-timer"></text>
@@ -98,6 +92,66 @@
                 <text id="cost" x="50%" y="8" class="svg-cost"></text>
             </svg>
         </div>
+        <div id="setup">
+            <div class="setup-item">
+                <label for="in-numPeople"># people: </label>
+                <input type="number" id="in-numPeople" value="20" maxlength="5" size="5"/>
+            </div>
+            <div class="setup-item">
+                <label for="in-costPerHourPerPerson">$/hr/person: </label>
+                <input type="number" id="in-costPerHourPerPerson" value="100" maxlength="4" size="4"/>
+            </div>
+            <div class="setup-item">
+                <label for="in-sourceTime">Start time: </label>
+                <input type="time" id="in-sourceTime" value="13:00"/>
+            </div>
+            <div class="setup-item">
+                <label for="in-targetTime">End time: </label>
+                <input type="time" id="in-targetTime" value="14:00"/>
+            </div>
+            <div class="setup-item">
+                <div>
+                    In time:
+                </div>
+                <div>
+                    <input type="button" id="reset-in-time-bgcolor" value="🚫" title="Reset to default">
+                    <input type="color" id="in-time-bgcolor"> <label for="in-time-bgcolor">Background color</label>
+                </div>
+                <div>
+                    <input type="button" id="reset-in-time-color" value="🚫" title="Reset to default">
+                    <input type="color" id="in-time-color"> <label for="in-time-color">Text color</label>
+                </div>
+                <div>
+                    <input type="button" id="reset-in-time-fill" value="🚫" title="Reset to default">
+                    <input type="color" id="in-time-fill"> <label for="in-time-fill">Text fill</label>
+                </div>
+                <div>
+                    <input type="button" id="reset-in-time-stroke" value="🚫" title="Reset to default">
+                    <input type="color" id="in-time-stroke"> <label for="in-time-stroke">Text stroke</label>
+                </div>
+            </div>
+            <div class="setup-item">
+                <div>
+                    Over time:
+                </div>
+                <div>
+                    <input type="button" id="reset-over-time-bgcolor" value="🚫" title="Reset to default">
+                    <input type="color" id="over-time-bgcolor"> <label for="over-time-bgcolor">Background color</label>
+                </div>
+                <div>
+                    <input type="button" id="reset-over-time-color" value="🚫" title="Reset to default">
+                    <input type="color" id="over-time-color"> <label for="over-time-color">Text color</label>
+                </div>
+                <div>
+                    <input type="button" id="reset-over-time-fill" value="🚫" title="Reset to default">
+                    <input type="color" id="over-time-fill"> <label for="over-time-fill">Text fill</label>
+                </div>
+                <div>
+                    <input type="button" id="reset-over-time-stroke" value="🚫" title="Reset to default">
+                    <input type="color" id="over-time-stroke"> <label for="over-time-stroke">Text stroke</label>
+                </div>
+            </div>
+        </div>
 
         <script>
             const timerElem = document.querySelector('#timer');
@@ -106,6 +160,17 @@
             const numPeopleElem = document.querySelector('#in-numPeople');
             const sourceTimeElem = document.querySelector('#in-sourceTime');
             const targetTimeElem = document.querySelector('#in-targetTime');
+            const rootElem = document.querySelector(':root');
+            const colorList = [
+                'in-time-bgcolor',
+                'in-time-color',
+                'in-time-fill',
+                'in-time-stroke',
+                'over-time-bgcolor',
+                'over-time-color',
+                'over-time-fill',
+                'over-time-stroke',
+            ];
 
             let msSinceLast = 0;
             let currentTotal = 0;
@@ -124,6 +189,22 @@
             costPerHourPerPersonElem.addEventListener('change', function(event) {
                 localStorage.setItem('costPerHourPerPerson', costPerHourPerPersonElem.value);
             });
+            for (const color of colorList) {
+                const colorDefault = getComputedStyle(rootElem).getPropertyValue(`--${color}`).trim();
+
+                const elem = document.querySelector(`#${color}`);
+                elem.addEventListener('input', function(event) {
+                    localStorage.setItem(color, elem.value);
+                    rootElem.style.setProperty(`--${color}`, elem.value);
+                });
+
+                const resetElem = document.querySelector(`#reset-${color}`);
+                resetElem.addEventListener('click', function(event) {
+                    localStorage.removeItem(color);
+                    rootElem.style.setProperty(`--${color}`, colorDefault);
+                    elem.value = colorDefault;
+                });
+            }
 
             const parseTimeFromElement = function(element) {
                 const givenTimeValues = element.value.split(':');
@@ -231,6 +312,20 @@
                 }
                 if (costPerHourPerPerson) {
                     costPerHourPerPersonElem.value = costPerHourPerPerson;
+                }
+
+                // attempt to set style variables from local storage
+                for (const color of colorList) {
+                    const storedVal = localStorage.getItem(color);
+                    if (storedVal) {
+                        rootElem.style.setProperty(`--${color}`, storedVal);
+                    }
+                }
+                // grab the computed style (either the default or just-overriden value)
+                const rootStyle = getComputedStyle(rootElem);
+                // set the input element to the current value
+                for (const color of colorList) {
+                    document.querySelector(`#${color}`).value = rootStyle.getPropertyValue(`--${color}`).trim();
                 }
             }
 
