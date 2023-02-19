@@ -363,7 +363,10 @@
                 }
             }
 
+            const defaultTransition = document.body.style.transition;
+            document.body.style.transition = 'none';
             applySavedValues();
+            document.body.style.transition = defaultTransition;
             updateTimer();
             updateCost();
             setInterval(updateTimer, 1000);
