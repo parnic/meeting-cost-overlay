@@ -113,6 +113,16 @@
 
             sourceTimeElem.addEventListener('change', function(event) {
                 currentTotal = 0;
+                localStorage.setItem('sourceTime', sourceTimeElem.value);
+            });
+            targetTimeElem.addEventListener('change', function(event) {
+                localStorage.setItem('targetTime', targetTimeElem.value);
+            });
+            numPeopleElem.addEventListener('change', function(event) {
+                localStorage.setItem('numPeople', numPeopleElem.value);
+            });
+            costPerHourPerPersonElem.addEventListener('change', function(event) {
+                localStorage.setItem('costPerHourPerPerson', costPerHourPerPersonElem.value);
             });
 
             let parseTimeFromElement = function(element) {
@@ -204,6 +214,27 @@
                 lastUpdateTime = nowMs;
             }
 
+            let applySavedValues = function() {
+                let sourceTime = localStorage.getItem('sourceTime');
+                let targetTime = localStorage.getItem('targetTime');
+                let numPeople = localStorage.getItem('numPeople');
+                let costPerHourPerPerson = localStorage.getItem('costPerHourPerPerson');
+
+                if (sourceTime) {
+                    sourceTimeElem.value = sourceTime;
+                }
+                if (targetTime) {
+                    targetTimeElem.value = targetTime;
+                }
+                if (numPeople) {
+                    numPeopleElem.value = numPeople;
+                }
+                if (costPerHourPerPerson) {
+                    costPerHourPerPersonElem.value = costPerHourPerPerson;
+                }
+            }
+
+            applySavedValues();
             updateTimer();
             updateCost();
             setInterval(updateTimer, 1000);
