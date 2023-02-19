@@ -100,8 +100,8 @@
         </div>
 
         <script>
-            const t = document.querySelector('#timer');
-            const c = document.querySelector('#cost');
+            const timerElem = document.querySelector('#timer');
+            const costElem = document.querySelector('#cost');
             const costPerHourPerPersonElem = document.querySelector('#in-costPerHourPerPerson');
             const numPeopleElem = document.querySelector('#in-numPeople');
             const sourceTimeElem = document.querySelector('#in-sourceTime');
@@ -171,12 +171,12 @@
                 let str = afterTime ? '+' : '';
                 if (hours > 0) {
                     str += `${hours}:${mins.toString().padStart(2, '0')}:`;
-                    t.className = 'text-with-hour';
+                    timerElem.className = 'text-with-hour';
                 } else {
                     str += `${mins}:`;
-                    t.className = 'text-no-hour';
+                    timerElem.className = 'text-no-hour';
                 }
-                t.textContent = `${str}${secs.toString().padStart(2, '0')}`;
+                timerElem.textContent = `${str}${secs.toString().padStart(2, '0')}`;
             }
 
             const updateCost = function() {
@@ -206,7 +206,7 @@
                     currentTotal += costSinceLast;
                 }
 
-                c.textContent = currentTotal.toLocaleString('en-US', { 
+                costElem.textContent = currentTotal.toLocaleString('en-US', { 
                     style: 'currency', 
                     currency: 'USD' 
                 });
