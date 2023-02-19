@@ -27,10 +27,6 @@
             #setup input[type=number] {
                 width: 4rem;
             }
-            #timer {
-                text-align: center;
-                line-height: 1;
-            }
             .text-with-hour {
                 font-size: 20vw;
             }
@@ -39,9 +35,6 @@
             }
             .smaller-text {
                 font-size: 5vw;
-            }
-            #cost {
-                text-align: center;
             }
             body {
                 font-family: 'Lato', sans-serif;
@@ -62,19 +55,17 @@
             .svg-baseline-hanging {
                 dominant-baseline: hanging;
             }
-            .svg-timer {
-                stroke-width: 1.3vh;
+            .custom-svg {
                 paint-order: stroke fill;
                 stroke-linecap: round;
                 stroke-linejoin: round;
                 text-anchor: middle;
             }
+            .svg-timer {
+                stroke-width: 1.3vh;
+            }
             .svg-cost {
                 stroke-width: 1vh;
-                paint-order: stroke fill;
-                stroke-linecap: round;
-                stroke-linejoin: round;
-                text-anchor: middle;
             }
             .mt-2 {
                 margin-top: 0.2em;
@@ -85,8 +76,6 @@
                 border: 0;
                 padding: 0.1em 0.3em;
                 margin: 0.1em;
-                /* background-image: linear-gradient(#ffd21f,#ffd21f 40%,#fc0 55%,#fc0);
-                box-shadow: inset 0 1px 2px #ffdc51,inset 0 -1px 2px #8c5c00,0 -.2rem .4rem rgba(255,204,0,.2),0 .1rem .2rem rgba(255,204,0,.2),0 .4rem .6rem rgba(0,0,0,.2); */
             }
             input[type=time] {
                 font-family: 'Lato', sans-serif;
@@ -95,11 +84,10 @@
                 min-width: 3em;
                 min-height: 2em;
             }
-            .btn:hover {
+            .btn:hover, .btn:active {
                 transform: scale(1.1);
             }
             .btn:active {
-                transform: scale(1.1);
                 box-shadow: inset 0 0 2rem #aaa,0 0 .6rem rgba(255,240,179,.3);
                 background: #fff0b3;
             }
@@ -108,12 +96,12 @@
     <body class="in-time">
         <div class="text-with-hour svg-baseline-hanging mt-2">
             <svg width="100%" height="1em">
-                <text id="timer" x="50%" y="0" class="svg-timer"></text>
+                <text id="timer" x="50%" y="0" class="svg-timer custom-svg"></text>
             </svg>
         </div>
         <div class="smaller-text svg-baseline-hanging">
             <svg width="100%" height="2em">
-                <text id="cost" x="50%" y="8" class="svg-cost"></text>
+                <text id="cost" x="50%" y="8" class="svg-cost custom-svg"></text>
             </svg>
         </div>
         <div id="setup">
@@ -205,6 +193,8 @@
                 'over-time-fill',
                 'over-time-stroke',
             ];
+            const colorElems = [];
+            colorList.forEach((color) => colorElems.push(document.querySelector(`#${color}`)));
 
             let msSinceLast = 0;
             let currentTotal = 0;
@@ -213,44 +203,40 @@
             const saveValue = (event) => {
                 localStorage.setItem(event.currentTarget.id, event.currentTarget.value);
             };
-            const saveChecked = (event) => {
+            const saveChecked = (event, affectedElem) => {
                 localStorage.setItem(event.currentTarget.id, event.currentTarget.checked);
+                if (affectedElem) {
+                    affectedElem.style.display = event.currentTarget.checked ? 'block' : 'none';
+                }
             };
 
-            sourceTimeElem.addEventListener('change', function(event) {
+            sourceTimeElem.addEventListener('change', (event) => {
                 currentTotal = 0;
                 saveValue(event);
             });
             targetTimeElem.addEventListener('change', saveValue);
             numPeopleElem.addEventListener('change', saveValue);
             costPerHourPerPersonElem.addEventListener('change', saveValue);
-            showTimerElem.addEventListener('change', (event) => {
-                saveChecked(event);
-                timerElem.style.display = event.currentTarget.checked ? 'block' : 'none';
-            });
-            showCostElem.addEventListener('change', (event) => {
-                saveChecked(event);
-                costElem.style.display = event.currentTarget.checked ? 'block' : 'none';
-            });
+            showTimerElem.addEventListener('change', (event) => saveChecked(event, timerElem));
+            showCostElem.addEventListener('change', (event) => saveChecked(event, costElem));
 
-            for (const color of colorList) {
-                const colorDefault = getComputedStyle(rootElem).getPropertyValue(`--${color}`).trim();
+            for (const colorElem of colorElems) {
+                const colorDefault = getComputedStyle(rootElem).getPropertyValue(`--${colorElem.id}`).trim();
 
-                const elem = document.querySelector(`#${color}`);
-                elem.addEventListener('input', function(event) {
+                colorElem.addEventListener('input', (event) => {
                     saveValue(event);
-                    rootElem.style.setProperty(`--${color}`, event.currentTarget.value);
+                    rootElem.style.setProperty(`--${colorElem.id}`, event.currentTarget.value);
                 });
 
-                const resetElem = document.querySelector(`#reset-${color}`);
-                resetElem.addEventListener('click', function(event) {
-                    localStorage.removeItem(color);
-                    rootElem.style.setProperty(`--${color}`, colorDefault);
-                    elem.value = colorDefault;
+                const resetElem = document.querySelector(`#reset-${colorElem.id}`);
+                resetElem.addEventListener('click', (event) => {
+                    localStorage.removeItem(colorElem.id);
+                    rootElem.style.setProperty(`--${colorElem.id}`, colorDefault);
+                    colorElem.value = colorDefault;
                 });
             }
 
-            const parseTimeFromElement = function(element) {
+            const parseTimeFromElement = (element) => {
                 const givenTimeValues = element.value.split(':');
                 const givenHour = parseInt(givenTimeValues[0]);
                 const givenMinute = parseInt(givenTimeValues[1]);
@@ -258,7 +244,7 @@
                 return {givenHour: givenHour, givenMinute: givenMinute};
             }
 
-            const hmsTimeDiff = function(durationMs) {
+            const hmsTimeDiff = (durationMs) => {
                 const totalSec = durationMs / 1000;
                 const secs = totalSec % 60;
                 const totalMins = totalSec / 60;
@@ -267,7 +253,7 @@
                 return {hours: Math.trunc(totalHours), mins: Math.trunc(mins), secs: Math.trunc(secs)};
             }
 
-            const getDateFromTimeElement = function(now, element) {
+            const getDateFromTimeElement = (now, element) => {
                 const {givenHour, givenMinute} = parseTimeFromElement(element);
                 if (isNaN(givenHour) || isNaN(givenMinute)) {
                     return null;
@@ -276,7 +262,7 @@
                 return new Date(now.getFullYear(), now.getMonth(), now.getDate(), givenHour, givenMinute, 0, 0);
             }
 
-            const updateTimer = function() {
+            const updateTimer = () => {
                 const now = new Date();
                 const targetTime = getDateFromTimeElement(now, targetTimeElem);
                 if (!targetTime) {
@@ -304,7 +290,7 @@
                 timerElem.textContent = `${str}${secs.toString().padStart(2, '0')}`;
             }
 
-            const updateCost = function() {
+            const updateCost = () => {
                 if (costPerHourPerPersonElem.value.length == 0 || numPeopleElem.value.length == 0) {
                     return;
                 }
@@ -339,7 +325,7 @@
                 lastUpdateTime = nowMs;
             }
 
-            const applySavedValues = function() {
+            const applySavedValues = () => {
                 const applyValue = (elem) => {
                     const savedVal = localStorage.getItem(elem.id);
                     if (savedVal) {
@@ -363,17 +349,17 @@
                 applyChecked(showCostElem);
 
                 // attempt to set style variables from local storage
-                for (const color of colorList) {
-                    const storedVal = localStorage.getItem(color);
+                for (const colorElem of colorElems) {
+                    const storedVal = localStorage.getItem(colorElem.id);
                     if (storedVal) {
-                        rootElem.style.setProperty(`--${color}`, storedVal);
+                        rootElem.style.setProperty(`--${colorElem.id}`, storedVal);
                     }
                 }
                 // grab the computed style (either the default or just-overriden value)
                 const rootStyle = getComputedStyle(rootElem);
                 // set the input element to the current value
-                for (const color of colorList) {
-                    document.querySelector(`#${color}`).value = rootStyle.getPropertyValue(`--${color}`).trim();
+                for (const colorElem of colorElems) {
+                    colorElem.value = rootStyle.getPropertyValue(`--${colorElem.id}`).trim();
                 }
             }
 
