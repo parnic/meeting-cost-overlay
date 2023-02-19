@@ -178,24 +178,24 @@
 
             sourceTimeElem.addEventListener('change', function(event) {
                 currentTotal = 0;
-                localStorage.setItem('sourceTime', sourceTimeElem.value);
+                localStorage.setItem('sourceTime', event.currentTarget.value);
             });
             targetTimeElem.addEventListener('change', function(event) {
-                localStorage.setItem('targetTime', targetTimeElem.value);
+                localStorage.setItem('targetTime', event.currentTarget.value);
             });
             numPeopleElem.addEventListener('change', function(event) {
-                localStorage.setItem('numPeople', numPeopleElem.value);
+                localStorage.setItem('numPeople', event.currentTarget.value);
             });
             costPerHourPerPersonElem.addEventListener('change', function(event) {
-                localStorage.setItem('costPerHourPerPerson', costPerHourPerPersonElem.value);
+                localStorage.setItem('costPerHourPerPerson', event.currentTarget.value);
             });
             for (const color of colorList) {
                 const colorDefault = getComputedStyle(rootElem).getPropertyValue(`--${color}`).trim();
 
                 const elem = document.querySelector(`#${color}`);
                 elem.addEventListener('input', function(event) {
-                    localStorage.setItem(color, elem.value);
-                    rootElem.style.setProperty(`--${color}`, elem.value);
+                    localStorage.setItem(color, event.currentTarget.value);
+                    rootElem.style.setProperty(`--${color}`, event.currentTarget.value);
                 });
 
                 const resetElem = document.querySelector(`#reset-${color}`);
