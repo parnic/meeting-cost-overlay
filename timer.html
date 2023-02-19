@@ -100,12 +100,12 @@
         </div>
 
         <script>
-            let t = document.querySelector('#timer');
-            let c = document.querySelector('#cost');
-            let costPerHourPerPersonElem = document.querySelector('#in-costPerHourPerPerson');
-            let numPeopleElem = document.querySelector('#in-numPeople');
-            let sourceTimeElem = document.querySelector('#in-sourceTime');
-            let targetTimeElem = document.querySelector('#in-targetTime');
+            const t = document.querySelector('#timer');
+            const c = document.querySelector('#cost');
+            const costPerHourPerPersonElem = document.querySelector('#in-costPerHourPerPerson');
+            const numPeopleElem = document.querySelector('#in-numPeople');
+            const sourceTimeElem = document.querySelector('#in-sourceTime');
+            const targetTimeElem = document.querySelector('#in-targetTime');
 
             let msSinceLast = 0;
             let currentTotal = 0;
@@ -125,25 +125,25 @@
                 localStorage.setItem('costPerHourPerPerson', costPerHourPerPersonElem.value);
             });
 
-            let parseTimeFromElement = function(element) {
-                let givenTimeValues = element.value.split(':');
-                let givenHour = parseInt(givenTimeValues[0]);
-                let givenMinute = parseInt(givenTimeValues[1]);
+            const parseTimeFromElement = function(element) {
+                const givenTimeValues = element.value.split(':');
+                const givenHour = parseInt(givenTimeValues[0]);
+                const givenMinute = parseInt(givenTimeValues[1]);
 
                 return {givenHour: givenHour, givenMinute: givenMinute};
             }
 
-            let hmsTimeDiff = function(durationMs) {
-                let totalSec = durationMs / 1000;
-                let secs = totalSec % 60;
-                let totalMins = totalSec / 60;
-                let mins = totalMins % 60;
-                let totalHours = totalMins / 60;
+            const hmsTimeDiff = function(durationMs) {
+                const totalSec = durationMs / 1000;
+                const secs = totalSec % 60;
+                const totalMins = totalSec / 60;
+                const mins = totalMins % 60;
+                const totalHours = totalMins / 60;
                 return {hours: Math.trunc(totalHours), mins: Math.trunc(mins), secs: Math.trunc(secs)};
             }
 
-            let getDateFromTimeElement = function(now, element) {
-                let {givenHour, givenMinute} = parseTimeFromElement(element);
+            const getDateFromTimeElement = function(now, element) {
+                const {givenHour, givenMinute} = parseTimeFromElement(element);
                 if (isNaN(givenHour) || isNaN(givenMinute)) {
                     return null;
                 }
@@ -151,14 +151,14 @@
                 return new Date(now.getFullYear(), now.getMonth(), now.getDate(), givenHour, givenMinute, 0, 0);
             }
 
-            let updateTimer = function() {
-                let now = new Date();
-                let targetTime = getDateFromTimeElement(now, targetTimeElem);
+            const updateTimer = function() {
+                const now = new Date();
+                const targetTime = getDateFromTimeElement(now, targetTimeElem);
                 if (!targetTime) {
                     return;
                 }
 
-                let afterTime = now > targetTime;
+                const afterTime = now > targetTime;
                 let remaining = targetTime - now;
                 if (afterTime) {
                     document.body.className = 'over-time';
@@ -167,7 +167,7 @@
                     document.body.className = 'in-time';
                 }
 
-                let {hours, mins, secs} = hmsTimeDiff(remaining);
+                const {hours, mins, secs} = hmsTimeDiff(remaining);
                 let str = afterTime ? '+' : '';
                 if (hours > 0) {
                     str += `${hours}:${mins.toString().padStart(2, '0')}:`;
@@ -179,29 +179,29 @@
                 t.textContent = `${str}${secs.toString().padStart(2, '0')}`;
             }
 
-            let updateCost = function() {
+            const updateCost = function() {
                 if (costPerHourPerPersonElem.value.length == 0 || numPeopleElem.value.length == 0) {
                     return;
                 }
 
-                let costPerHourPerPerson = parseFloat(costPerHourPerPersonElem.value);
-                let numPeople = parseInt(numPeopleElem.value);
+                const costPerHourPerPerson = parseFloat(costPerHourPerPersonElem.value);
+                const numPeople = parseInt(numPeopleElem.value);
                 if (!costPerHourPerPerson || !numPeople) {
                     return;
                 }
 
-                let now = new Date();
-                let nowMs = now.getTime();
-                let sourceTime = getDateFromTimeElement(now, sourceTimeElem);
+                const now = new Date();
+                const nowMs = now.getTime();
+                const sourceTime = getDateFromTimeElement(now, sourceTimeElem);
                 if (!sourceTime) {
                     return;
                 }
 
                 if (sourceTime < now) {
-                    let costPerPersonPerMs = costPerHourPerPerson / 60 / 60 / 1000;
-                    let msSinceLast = nowMs - lastUpdateTime;
-                    let costPerPersonSinceLast = costPerPersonPerMs * msSinceLast;
-                    let costSinceLast = costPerPersonSinceLast * numPeople;
+                    const costPerPersonPerMs = costPerHourPerPerson / 60 / 60 / 1000;
+                    const msSinceLast = nowMs - lastUpdateTime;
+                    const costPerPersonSinceLast = costPerPersonPerMs * msSinceLast;
+                    const costSinceLast = costPerPersonSinceLast * numPeople;
 
                     currentTotal += costSinceLast;
                 }
@@ -214,11 +214,11 @@
                 lastUpdateTime = nowMs;
             }
 
-            let applySavedValues = function() {
-                let sourceTime = localStorage.getItem('sourceTime');
-                let targetTime = localStorage.getItem('targetTime');
-                let numPeople = localStorage.getItem('numPeople');
-                let costPerHourPerPerson = localStorage.getItem('costPerHourPerPerson');
+            const applySavedValues = function() {
+                const sourceTime = localStorage.getItem('sourceTime');
+                const targetTime = localStorage.getItem('targetTime');
+                const numPeople = localStorage.getItem('numPeople');
+                const costPerHourPerPerson = localStorage.getItem('costPerHourPerPerson');
 
                 if (sourceTime) {
                     sourceTimeElem.value = sourceTime;
