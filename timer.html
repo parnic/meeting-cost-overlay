@@ -134,6 +134,14 @@
                 <input type="time" id="in-targetTime" value="14:00"/>
             </div>
             <div class="setup-item">
+                <input type="checkbox" id="in-show-timer" checked>
+                <label for="in-show-timer">Show timer</label>
+            </div>
+            <div class="setup-item">
+                <input type="checkbox" id="in-show-cost" checked>
+                <label for="in-show-cost">Show cost</label>
+            </div>
+            <div class="setup-item">
                 <div>
                     In time:
                 </div>
@@ -184,6 +192,8 @@
             const numPeopleElem = document.querySelector('#in-numPeople');
             const sourceTimeElem = document.querySelector('#in-sourceTime');
             const targetTimeElem = document.querySelector('#in-targetTime');
+            const showTimerElem = document.querySelector('#in-show-timer');
+            const showCostElem = document.querySelector('#in-show-cost');
             const rootElem = document.querySelector(':root');
             const colorList = [
                 'in-time-bgcolor',
@@ -203,6 +213,10 @@
             const saveValue = (event) => {
                 localStorage.setItem(event.currentTarget.id, event.currentTarget.value);
             };
+            const saveChecked = (event) => {
+                localStorage.setItem(event.currentTarget.id, event.currentTarget.checked);
+            };
+
             sourceTimeElem.addEventListener('change', function(event) {
                 currentTotal = 0;
                 saveValue(event);
@@ -210,6 +224,14 @@
             targetTimeElem.addEventListener('change', saveValue);
             numPeopleElem.addEventListener('change', saveValue);
             costPerHourPerPersonElem.addEventListener('change', saveValue);
+            showTimerElem.addEventListener('change', (event) => {
+                saveChecked(event);
+                timerElem.style.display = event.currentTarget.checked ? 'block' : 'none';
+            });
+            showCostElem.addEventListener('change', (event) => {
+                saveChecked(event);
+                costElem.style.display = event.currentTarget.checked ? 'block' : 'none';
+            });
 
             for (const color of colorList) {
                 const colorDefault = getComputedStyle(rootElem).getPropertyValue(`--${color}`).trim();
@@ -326,10 +348,19 @@
                         elem.dispatchEvent(new Event('change'));
                     }
                 }
+                const applyChecked = (elem) => {
+                    const savedChecked = localStorage.getItem(elem.id);
+                    if (savedChecked !== null) {
+                        elem.checked = savedChecked === "true";
+                        elem.dispatchEvent(new Event('change'));
+                    }
+                }
                 applyValue(sourceTimeElem);
                 applyValue(targetTimeElem);
                 applyValue(numPeopleElem);
                 applyValue(costPerHourPerPersonElem);
+                applyChecked(showTimerElem);
+                applyChecked(showCostElem);
 
                 // attempt to set style variables from local storage
                 for (const color of colorList) {
